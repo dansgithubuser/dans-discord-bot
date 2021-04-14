@@ -13,6 +13,8 @@ import sys
 parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--run', action='store_true')
 parser.add_argument('-t', '--test', metavar='channel ID')
+parser.add_argument('--docker-build', '--dkrb', action='store_true')
+parser.add_argument('--docker-run', '--dkrr', action='store_true')
 parser.add_argument('-o', '--origin', default='http://localhost:8000')
 args = parser.parse_args()
 
@@ -80,6 +82,14 @@ if args.run:
 
 if args.test:
     import requests
-    requests.post(f'{args.origin}/channel/{args.test}/message', json={
+    res = requests.post(f'{args.origin}/channel/{args.test}/message', json={
         'message': 'Hello, again.',
     })
+    print(f'{res} {res.text}')
+
+if args.docker_build:
+    invoke('docker build -t dans-discord-bot .')
+
+if args.docker_run:
+    port = os.environ.get('DANS_DISCORD_BOT_PORT', 8000)
+    invoke(f'docker run -d -p {port}:{port} --name dans-discord-bot dans-discord-bot')
