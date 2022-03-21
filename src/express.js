@@ -26,6 +26,14 @@ function spamming(sender) {
   return false;
 }
 
+function ddosing() {
+  if (Object.keys(fSendCounts).length > 100) {
+    logger.info("I think I'm being DDoSed.");
+    return true;
+  }
+  return false;
+}
+
 function asyncHandler(callback) {
   return (req, res, next) => {
     callback(req, res, next).catch((e) => {
@@ -48,6 +56,9 @@ app.use(bodyParser.json());
 
 //===== routes =====//
 app.post('/channel/:id/message', asyncHandler(async (req, res) => {
+  if (ddosing()) {
+    return res.sendStatus(404);
+  }
   if (spamming(req.body.sender)) {
     return res.status(400).send('Refusing to send spam. Stop spamming immediately. Do not repeat this mistake.');
   }
