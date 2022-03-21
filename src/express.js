@@ -74,7 +74,7 @@ app.post('/channel/:id/message', asyncHandler(async (req, res) => {
     warning = '\nWARN: Close to message quota. Messages from this sender will be declared spam soon.';
   }
   const channel = await discord.channels.fetch(req.params.id);
-  channel.send(`${req.body.message}\n(sender: ${req.params.sender})${warning}`);
+  channel.send(`${req.body.message}\n(sender: ${req.body.sender})${warning}`);
   return res.sendStatus(200);
 }));
 
