@@ -10,6 +10,14 @@ app.disable('x-powered-by');
 
 fSendCounts = {};
 
+function ddosing() {
+  if (Object.keys(fSendCounts).length > 100) {
+    logger.info("I think I'm being DDoSed.");
+    return true;
+  }
+  return false;
+}
+
 function spamming(sender) {
   const now = new Date();
   if (!fSendCounts[sender]) fSendCounts[sender] = [];
@@ -26,9 +34,8 @@ function spamming(sender) {
   return false;
 }
 
-function ddosing() {
-  if (Object.keys(fSendCounts).length > 100) {
-    logger.info("I think I'm being DDoSed.");
+function almostSpamming(sender) {
+  if (fSendCounts[sender].length > 7) {
     return true;
   }
   return false;
@@ -62,8 +69,12 @@ app.post('/channel/:id/message', asyncHandler(async (req, res) => {
   if (spamming(req.body.sender)) {
     return res.status(400).send('Refusing to send spam. Stop spamming immediately. Do not repeat this mistake.');
   }
+  let warning = '';
+  if (almostSpamming(req.body.sender)) {
+    warning = '\nWARN: Close to message quota. Messages from this sender will be declared spam soon.';
+  }
   const channel = await discord.channels.fetch(req.params.id);
-  channel.send(req.body.message);
+  channel.send(`${req.body.message}\n(sender: ${req.params.sender})${warning}`);
   return res.sendStatus(200);
 }));
 
