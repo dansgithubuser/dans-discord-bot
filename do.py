@@ -92,4 +92,12 @@ if args.docker_build:
 
 if args.docker_run:
     port = os.environ.get('DANS_DISCORD_BOT_PORT', 8000)
-    invoke(f'docker run --detach --publish {port}:8000 --name dans-discord-bot dans-discord-bot')
+    token = os.environ['DANS_DISCORD_BOT_TOKEN']
+    invoke(' '.join([
+        'docker run',
+        '--detach',
+        f'--publish {port}:8000',
+        f'--env DANS_DISCORD_BOT_TOKEN={token}',
+        '--name dans-discord-bot',
+        'dans-discord-bot',
+    ]))
