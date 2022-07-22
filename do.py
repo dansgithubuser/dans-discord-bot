@@ -99,5 +99,6 @@ if args.docker_run:
         f'--publish {port}:8000',
         f'--env DANS_DISCORD_BOT_TOKEN={token}',
         '--name dans-discord-bot',
+        '--restart always',
         'dans-discord-bot',
     ]))
