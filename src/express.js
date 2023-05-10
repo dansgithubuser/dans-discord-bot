@@ -82,4 +82,4 @@ app.post('/channel/:id/message', asyncHandler(async (req, res) => {
 }));
 
 //===== main =====//
-app.listen(process.env.DANS_DISCORD_BOT_PORT || 8000);
+app.listen(8000);

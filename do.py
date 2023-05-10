@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--run', action='store_true')
 parser.add_argument('-t', '--test', metavar='channel ID')
 parser.add_argument('--docker-build', '--dkrb', action='store_true')
-parser.add_argument('--docker-run', '--dkrr', action='store_true')
+parser.add_argument('--docker-run', '--dkrr', metavar='port')
 parser.add_argument('-o', '--origin', default='http://localhost:8000')
 args = parser.parse_args()
 
@@ -91,13 +91,12 @@ if args.docker_build:
     invoke('docker build -t dans-discord-bot .')
 
 if args.docker_run:
-    port = os.environ.get('DANS_DISCORD_BOT_PORT', 8000)
-    token = os.environ['DANS_DISCORD_BOT_TOKEN']
+    port = args.docker_run
     invoke(' '.join([
         'docker run',
         '--detach',
         f'--publish {port}:8000',
-        f'--env DANS_DISCORD_BOT_TOKEN={token}',
+        '--env-file .env',
         '--name dans-discord-bot',
         '--restart always',
         'dans-discord-bot',
