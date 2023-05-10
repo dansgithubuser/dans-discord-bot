@@ -8,10 +8,13 @@ const app = express();
 
 app.disable('x-powered-by');
 
+const SPAM_THRESHOLD = process.env.DANS_DISCORD_BOT_SPAM_THRESHOLD || 10;
+const DDOS_THRESHOLD = process.env.DANS_DISCORD_BOT_DDOS_THRESHOLD || 100;
+
 fSendCounts = {};
 
 function ddosing() {
-  if (Object.keys(fSendCounts).length > 100) {
+  if (Object.keys(fSendCounts).length > DDOS_THRESHOLD) {
     logger.info("I think I'm being DDoSed.");
     return true;
   }
@@ -25,8 +28,8 @@ function spamming(sender) {
     fSendCounts[sender] = fSendCounts[sender].splice(1);
   }
   fSendCounts[sender].push(new Date());
-  if (fSendCounts[sender].length > 10) {
-    if (fSendCounts[sender].length < 100) {
+  if (fSendCounts[sender].length > SPAM_THRESHOLD) {
+    if (fSendCounts[sender].length < SPAM_THRESHOLD + 10) {
       logger.info(`Blocking spam from ${sender}. ${fSendCounts[sender].length} messages sent in past hour.`);
     }
     return true;
@@ -35,7 +38,7 @@ function spamming(sender) {
 }
 
 function almostSpamming(sender) {
-  if (fSendCounts[sender].length > 7) {
+  if (fSendCounts[sender].length > SPAM_THRESHOLD - 3) {
     return true;
   }
   return false;
